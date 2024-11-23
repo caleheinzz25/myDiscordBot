@@ -1,0 +1,27 @@
+import { getObjectModules } from '../utils/logger.js';
+
+const events = await getObjectModules("src/events");
+
+const eventHandler = (client) => {
+    for (const [eventName, eventFiles] of Object.entries(events)) {
+        if (!eventFiles || eventFiles.length === 0) continue;
+
+        if (eventFiles.length > 1){
+            client.on(eventName, async (arg) => {      
+                for (const eventFile of eventFiles) {
+                    await eventFile.default(client, arg);
+                    console.log(`Loaded event handler for ${eventName}`);
+                }
+            });
+            continue;
+        }
+        client.on(eventName, async (arg) => {      
+            await eventFiles[0].default(client, arg);
+            console.log(`Loaded event handler for ${eventName}`);
+        });
+        console.log(`Loaded event handler for ${eventName}`);
+
+    }
+};
+
+export { eventHandler };

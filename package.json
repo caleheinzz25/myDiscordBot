@@ -1,0 +1,24 @@
+{
+  "name": "kaorubot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev:warning": "nodemon --trace-warnings ./src/bot.js",
+    "dev": "nodemon ./src/bot.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "discord.js": "^14.16.3",
+    "esbuild": "^0.24.0",
+    "esbuild-plugin-alias": "^0.2.1",
+    "nodemon": "^3.1.7"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "pretty-ms": "^9.2.0"
+  }
+}

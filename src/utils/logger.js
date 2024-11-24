@@ -2,8 +2,10 @@ import config from '../config/config.json' with { type : 'json'};
 import membersId from '../config/membersId.json' with { type : 'json' };
 import getApplicationCommands from './getApplicationCommands.js';
 import areCommandsDifferent from './areCommandDifferent.js';
+import calculateLevelXp from './calculateLevelXp.js';
 import fs from 'fs/promises';
 import path from 'path';
+import { throws } from 'assert';
 // import { fileURLToPath } from 'url';
 
 /**
@@ -74,30 +76,58 @@ const organizeFilesByMainFolders = async (basePath) => {
  * Dynamically import modules from specified directory
  * @param {string} directory - Base directory for module search
  * @param {string} [targetFolder=null] - Optional specific folder to target
+ * @param {bool} [objectMode=false] - 
  * @returns {Promise<Object>} Imported modules
  */
-const getObjectModules = async (directory, targetFolder = null) => {
+const getObjectModules = async (directory, targetFolder = null, objectMode = false) => {
     const organizedFiles = await organizeFilesByMainFolders(directory);
     const modules = {};
 
     for (const folder of organizedFiles) {
-        if (targetFolder && folder.folder !== targetFolder) continue;
-
-        const folderModules = [];
-        for (const file of folder.files) {
-            const modulePath = path.resolve(directory, file);
-            
-            try {
-                if (path.extname(modulePath) !== '.js') continue;
-                
-                const module = await import(`file://${modulePath}`);
-                folderModules.push(module);
-            } catch (error) {
-                console.error(`Failed to load module from: ${modulePath}`, error);
+        try {
+            if (targetFolder && folder.folder !== targetFolder) continue;
+            if(objectMode) {     
+                const folderModules = {};
+                for (const file of folder.files) {
+                    const modulePath = path.resolve(directory, file);
+                    
+                    try {
+                        if (path.extname(modulePath) !== '.js') continue;
+                        const module = await import(`file://${modulePath}`);
+                        if (Object.keys(module)[0] === "default") {
+                            console.error("\n❌ cannot convert property named default\n");
+                            return;
+                        }
+                        folderModules[Object.keys(module)] = module[Object.keys(module)];
+                    } catch (error) {
+                        console.error(`Failed to load module from: ${modulePath}`, error);
+                    }
+                }
+    
+                modules[folder.folder] = folderModules;
+                continue;
             }
-        }
+    
+            const folderModules = [];
+            for (const file of folder.files) {
+                const modulePath = path.resolve(directory, file);
+                
+                try {
+                    if (path.extname(modulePath) !== '.js') continue;
+                    
+                    const module = await import(`file://${modulePath}`);
+                    folderModules.push(module);
+                } catch (error) {
+                    console.error(`Failed to load module from: ${modulePath}`, error);
+                }
+            }
+            modules[folder.folder] = folderModules;
 
-        modules[folder.folder] = folderModules;
+        }catch (error) {
+            console.log("cannot convert property named default")
+            console.error(`Error processing folder "${folder.folder}":`, error);
+            continue;
+        }
     }
 
     return modules;
@@ -123,6 +153,6 @@ export {
     organizeFilesByMainFolders, 
     getFilesRecursively, 
     getModules,
-    config, areCommandsDifferent, getApplicationCommands, membersId
+    config, areCommandsDifferent, getApplicationCommands, membersId, calculateLevelXp
 };
 

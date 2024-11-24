@@ -37,7 +37,7 @@ const checkPermissions = (interaction, commandObject) => {
   return { allowed: true };
 };
 
-export default async (client, interaction) => {
+export default async (client, interaction, distube) => {
   if (!interaction.isChatInputCommand) return;
 
   try {

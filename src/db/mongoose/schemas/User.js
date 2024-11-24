@@ -2,11 +2,11 @@ import { Schema, model } from "mongoose";
 
 const userSchema = model("User" , 
     new Schema({
-        userId: {
+        user_id: {
           type: String,
           required: true,
         },
-        guildId: {
+        guild_id: {
           type: String,
           required: true,
         },
@@ -14,9 +14,9 @@ const userSchema = model("User" ,
           type: Number,
           default: 0,
         },
-        lastDaily: {
+        last_daily: {
           type: Date,
-          reqired: true,
+          required: true,
         },
     })
 )

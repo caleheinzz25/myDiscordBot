@@ -27,14 +27,14 @@ export default {
             await interaction.deferReply();
 
             const query = {
-                userId: interaction.member.id,
-                guildId: interaction.guild.id,
+                user_id: interaction.member.id,
+                guild_id: interaction.guild.id,
             };
 
             let user = await userSchema.findOne(query);
 
             if (user) {
-                const lastDailyDate = user.lastDaily.toDateString();
+                const lastDailyDate = user.last_daily.toDateString();
                 const currentDate = new Date().toDateString();
 
                 if (lastDailyDate === currentDate) {
@@ -44,11 +44,11 @@ export default {
                 return;
                 }
 
-                user.lastDaily = new Date();
+                user.last_daily = new Date();
             } else {
                 user = new userSchema({
                 ...query,
-                lastDaily: new Date(),
+                last_daily: new Date(),
                 });
             }
 

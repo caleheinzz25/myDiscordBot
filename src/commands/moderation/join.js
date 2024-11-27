@@ -6,16 +6,18 @@ import {
   import { joinVoiceChannel } from '@discordjs/voice';
   
   export default {
-    name: 'join',
-    description: 'Joins a voice channel and ensures the bot is not deafened.',
-    options: [
-      {
-        name: 'channel',
-        description: 'The voice channel you want the bot to join.',
-        type: ApplicationCommandOptionType.Channel,
-        required: true,
-      },
-    ],
+    command:{
+      name: 'join',
+      description: 'Joins a voice channel and ensures the bot is not deafened.',
+      options: [
+        {
+          name: 'channel',
+          description: 'The voice channel you want the bot to join.',
+          type: ApplicationCommandOptionType.Channel,
+          required: true,
+        },
+      ]
+    },
     permissionsRequired: [PermissionFlagsBits.Connect],
     botPermissions: [PermissionFlagsBits.Connect, PermissionFlagsBits.Speak],
   

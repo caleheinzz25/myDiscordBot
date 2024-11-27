@@ -1,7 +1,9 @@
 // import { config } from "../../utils/logger.js";
 // import fs from "fs";
-export default async (client) => {
+export default async ({ client }) => {
+    client.riffy.init(client.user.id);
     console.log(`Logged in as ${client.user.tag}`);
+
 //     try {
 //         // Get all guilds the bot is in
 //         const guild = client.guilds.cache.get(config.testServer); // Replace with your guild ID

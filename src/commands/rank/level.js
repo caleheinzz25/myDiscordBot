@@ -5,8 +5,7 @@ import {
     AttachmentBuilder 
 } from 'discord.js';
 import { Font, RankCardBuilder } from 'canvacord';
-import { calculateLevelXp, getObjectModules } from '../../utils/logger.js';
-const { mongoose: { levelSchema } } = await getObjectModules("src/db", "mongoose", true);
+import { calculateLevelXp } from '../../utils/logger.js';
 Font.loadDefault();
 
 export default {
@@ -15,7 +14,7 @@ export default {
      * @param {Client} client
      * @param {Interaction} interaction
      */
-    callback: async (client, interaction) => {
+    callback: async (client, interaction, { mongoose }) => {
         if (!interaction.inGuild()) {
         interaction.reply('You can only run this command inside a server.');
         return;
@@ -27,7 +26,7 @@ export default {
         const targetUserId = mentionedUserId || interaction.member.id;
         const targetUserObj = await interaction.guild.members.fetch(targetUserId);
 
-        const fetchedLevel = await levelSchema.findOne({
+        const fetchedLevel = await mongoose.levelSchema.findOne({
         user_id: targetUserId,
         guild_id: interaction.guild.id,
         });
@@ -41,7 +40,7 @@ export default {
         return;
         }
 
-        let allLevels = await levelSchema.find({ guild_id: interaction.guild.id }).select(
+        let allLevels = await mongoose.levelSchema.find({ guild_id: interaction.guild.id }).select(
         '-_id user_id level xp'
         );
 
@@ -76,15 +75,19 @@ export default {
         const attachment = new AttachmentBuilder(cardBuffer, { name: 'rank.png' });
         interaction.editReply({ files: [attachment], ephemeral: true });
     },
-
-    name: 'level',
-    description: "Shows your/someone's level.",
-    options: [
-        {
-        name: 'target-user',
-        description: 'The user whose level you want to see.',
-        type: ApplicationCommandOptionType.Mentionable,
-        },
+    db: [
+        "mongoose"
     ],
+    command: {
+        name: 'level',
+        description: "Shows your/someone's level.",
+        options: [
+            {
+            name: 'target-user',
+            description: 'The user whose level you want to see.',
+            type: ApplicationCommandOptionType.Mentionable,
+            },
+        ],
+    }
     // deleted: true
 };

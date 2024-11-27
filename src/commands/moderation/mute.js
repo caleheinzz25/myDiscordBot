@@ -4,27 +4,29 @@ import {
 } from 'discord.js';
 
 export default {
-  name: 'mute',
-  description: 'Mutes a member in voice channels.',
-  options: [
-    {
-      name: 'target-user',
-      description: 'The user you want to mute.',
-      type: ApplicationCommandOptionType.User,
-      required: true,
-    },
-    {
-      name: 'duration',
-      description: 'The duration of the mute in minutes.',
-      type: ApplicationCommandOptionType.Integer,
-      required: true,
-    },
-    {
-      name: 'reason',
-      description: 'The reason for the mute.',
-      type: ApplicationCommandOptionType.String,
-    },
-  ],
+  command:{
+    name: 'mute',
+    description: 'Mutes a member in voice channels.',
+    options: [
+      {
+        name: 'target-user',
+        description: 'The user you want to mute.',
+        type: ApplicationCommandOptionType.User,
+        required: true,
+      },
+      {
+        name: 'duration',
+        description: 'The duration of the mute in minutes.',
+        type: ApplicationCommandOptionType.Integer,
+        required: true,
+      },
+      {
+        name: 'reason',
+        description: 'The reason for the mute.',
+        type: ApplicationCommandOptionType.String,
+      },
+    ]
+  },
   permissionsRequired: [PermissionFlagsBits.MuteMembers],
   botPermissions: [PermissionFlagsBits.MuteMembers],
 

@@ -1,20 +1,24 @@
 import { Client, CommandInteraction } from 'discord.js';
-import { getObjectModules } from '../../utils/logger.js';
-const { mongoose: { userSchema } } = await getObjectModules("src/db", "mongoose", true);
+
 
 
 
 const dailyAmount = 1000;
 
 export default {
-  name: 'daily',
-  description: 'Collect your dailies!',
-  /**
-   *
-   * @param {Client} client
-   * @param {CommandInteraction} interaction
-   */
-    callback: async (client, interaction) => {
+    db: [
+        "mongoose"
+    ],
+    command:{
+        name: 'daily',
+        description: 'Collect your dailies!'
+    },
+    /**
+     *
+     * @param {Client} client
+     * @param {CommandInteraction} interaction
+     */
+    callback: async ({client, interaction, db: { mongoose } }) => {
         if (!interaction.inGuild()) {
             interaction.reply({
                 content: 'You can only run this command inside a server.',
@@ -31,7 +35,7 @@ export default {
                 guild_id: interaction.guild.id,
             };
 
-            let user = await userSchema.findOne(query);
+            let user = await mongoose.userSchema.findOne(query);
 
             if (user) {
                 const lastDailyDate = user.last_daily.toDateString();
@@ -46,7 +50,7 @@ export default {
 
                 user.last_daily = new Date();
             } else {
-                user = new userSchema({
+                user = new mongoose.userSchema({
                 ...query,
                 last_daily: new Date(),
                 });

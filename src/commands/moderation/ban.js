@@ -5,25 +5,25 @@ import {
 } from 'discord.js';
 
 export default {
-
-
-
+    devOnly: true,
     deleted: false,
-    name: 'ban',
-    description: 'Bans a member from this server.',
-    options: [
-        {
-        name: 'target-user',
-        description: 'The user you want to ban.',
-        type: ApplicationCommandOptionType.Mentionable,
-        required: true,
-        },
-        {
-        name: 'reason',
-        description: 'The reason for the ban.',
-        type: ApplicationCommandOptionType.String,
-        },
-    ],
+    command:{
+        name: 'ban',
+        description: 'Bans a member from this server.',
+        options: [
+            {
+            name: 'target-user',
+            description: 'The user you want to ban.',
+            type: ApplicationCommandOptionType.Mentionable,
+            required: true,
+            },
+            {
+            name: 'reason',
+            description: 'The reason for the ban.',
+            type: ApplicationCommandOptionType.String,
+            },
+        ]
+    },
     permissionsRequired: [PermissionFlagsBits.BanMembers],
     botPermissions: [PermissionFlagsBits.BanMembers],
 

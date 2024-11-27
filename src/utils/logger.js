@@ -1,12 +1,9 @@
 import config from '../config/config.json' with { type : 'json'};
-import membersId from '../config/membersId.json' with { type : 'json' };
-import getApplicationCommands from './getApplicationCommands.js';
-import areCommandsDifferent from './areCommandDifferent.js';
+// import membersId from '../config/membersId.json' with { type : 'json' };
+// import getApplicationCommands from './getApplicationCommands.js';
+// import areCommandsDifferent from './areCommandDifferent.js';
 import calculateLevelXp from './calculateLevelXp.js';
-import fs from 'fs/promises';
-import path from 'path';
-import { throws } from 'assert';
-// import { fileURLToPath } from 'url';
+
 
 /**
  * Recursively retrieve files and folders from a directory
@@ -148,11 +145,50 @@ const getModules = async (basePath, targetFolder = null) => {
         );
 };
 
+
+
+/**
+ * @typedef {Object} EventHandlerOptions
+ * @property {Object} client
+ * @property {string} [commandsPath] - The name of the event handler.
+ * @property {string} [eventsPath] - The priority level of the event handler.
+ * @property {boolean} devServer - Whether the event handler is active. Optional.
+ */
+
+/**
+ * Class to manage event handlers.
+ */
+class EventHandlers {
+    /**
+     * @param {EventHandlerOptions} options - The options for the event handler.
+     */
+    constructor(options){
+        this.obj = {
+            ...options
+        }
+
+        console.log(this.obj)
+    }
+
+    /**
+     * Extract and flatten modules from imported objects
+     * @param {string} basePath - Base directory path
+     * @param {string} [targetFolder=null] - Optional specific folder to target
+     * @returns {Promise<Array>} Flattened modules
+     */
+    async getModules(basePath, targetFolder = null) 
+    {
+        const object = await getObjectModules(basePath, targetFolder);
+        
+        return Object.values(object)
+            .flatMap(event => 
+                event.map(ev => ev[Object.keys(ev)[0]])
+            );
+    };
+}
+
+
 export { 
-    getObjectModules, 
-    organizeFilesByMainFolders, 
-    getFilesRecursively, 
-    getModules,
-    config, areCommandsDifferent, getApplicationCommands, membersId, calculateLevelXp
+    config, calculateLevelXp,
 };
 

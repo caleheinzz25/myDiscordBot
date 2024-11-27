@@ -4,25 +4,27 @@
     } from 'discord.js';
     
     export default {
-      name: 'kick',
-      description: 'Kicks a member from this server.',
-      options: [
-        {
-          name: 'target-user',
-          description: 'The user you want to kick.',
-          type: ApplicationCommandOptionType.User,
-          required: true,
-        },
-        {
-          name: 'reason',
-          description: 'The reason for the kick.',
-          type: ApplicationCommandOptionType.String,
-        },
-      ],
+      command:{
+        name: 'kick',
+        description: 'Kicks a member from this server.',
+        options: [
+          {
+            name: 'target-user',
+            description: 'The user you want to kick.',
+            type: ApplicationCommandOptionType.User,
+            required: true,
+          },
+          {
+            name: 'reason',
+            description: 'The reason for the kick.',
+            type: ApplicationCommandOptionType.String,
+          },
+        ]
+      },
       permissionsRequired: [PermissionFlagsBits.KickMembers],
       botPermissions: [PermissionFlagsBits.KickMembers],
     
-      callback: async (client, interaction) => {
+      callback: async ({client, interaction}) => {
         try {
           const targetUserId = interaction.options.get('target-user').value;
           const reason =

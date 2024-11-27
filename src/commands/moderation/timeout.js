@@ -4,27 +4,29 @@ import {
   } from 'discord.js';
   
   export default {
-    name: 'timeout',
-    description: 'Times out (mutes) a member from this server.',
-    options: [
-      {
-        name: 'target-user',
-        description: 'The user you want to timeout.',
-        type: ApplicationCommandOptionType.Mentionable,
-        required: true,
-      },
-      {
-        name: 'duration',
-        description: 'The duration of the timeout in minutes.',
-        type: ApplicationCommandOptionType.Integer,
-        required: true,
-      },
-      {
-        name: 'reason',
-        description: 'The reason for the timeout.',
-        type: ApplicationCommandOptionType.String,
-      },
-    ],
+    command: {
+      name: 'timeout',
+      description: 'Times out (mutes) a member from this server.',
+      options: [
+        {
+          name: 'target-user',
+          description: 'The user you want to timeout.',
+          type: ApplicationCommandOptionType.Mentionable,
+          required: true,
+        },
+        {
+          name: 'duration',
+          description: 'The duration of the timeout in minutes.',
+          type: ApplicationCommandOptionType.Integer,
+          required: true,
+        },
+        {
+          name: 'reason',
+          description: 'The reason for the timeout.',
+          type: ApplicationCommandOptionType.String,
+        },
+      ]
+    },
     permissionsRequired: [PermissionFlagsBits.ModerateMembers],
     botPermissions: [PermissionFlagsBits.ModerateMembers],
   

@@ -38,13 +38,13 @@ export default async ({ client, eventArg }) => {
     //     }
     // }
 
-    if (command === "skip") {
-        const player = client.riffy.players.get(eventArg.guild.id);
-        if (!player) return eventArg.channel.send("No player found.");
+    // if (command === "skip") {
+    //     const player = client.riffy.players.get(eventArg.guild.id);
+    //     if (!player) return eventArg.channel.send("No player found.");
 
-        player.stop();
-        eventArg.channel.send("Skipped the current song.");
-    }
+    //     player.stop();
+    //     eventArg.channel.send("Skipped the current song.");
+    // }
 
     // if (command === "stop") {
     //     const player = client.riffy.players.get(eventArg.guild.id);
@@ -81,191 +81,191 @@ export default async ({ client, eventArg }) => {
     //     eventArg.channel.send(`Set the player volume to: \`${volume}\`.`);
     // }
 
-    if (command === "queue") {
-        const player = client.riffy.players.get(eventArg.guild.id);
-        if (!player) return eventArg.channel.send("No player found.");
+    // if (command === "queue") {
+    //     const player = client.riffy.players.get(eventArg.guild.id);
+    //     if (!player) return eventArg.channel.send("No player found.");
 
-        const queue = player.queue;
-        if (!queue.length) return eventArg.channel.send("No songs in queue.");
+    //     const queue = player.queue;
+    //     if (!queue.length) return eventArg.channel.send("No songs in queue.");
 
-        const embed = {
-        title: "Queue",
-        description: queue.map((track, i) => {
-            return `${i + 1}) ${track.info.title} | ${track.info.author}`;
-        }).join("\n")
-        };
+    //     const embed = {
+    //     title: "Queue",
+    //     description: queue.map((track, i) => {
+    //         return `${i + 1}) ${track.info.title} | ${track.info.author}`;
+    //     }).join("\n")
+    //     };
 
-        eventArg.channel.send({ embeds: [embed] });
-    }
+    //     eventArg.channel.send({ embeds: [embed] });
+    // }
 
-    if (command === "nowplaying") {
-        const player = client.riffy.players.get(eventArg.guild.id);
-        if (!player) return eventArg.channel.send("No player found.");
+    // if (command === "nowplaying") {
+    //     const player = client.riffy.players.get(eventArg.guild.id);
+    //     if (!player) return eventArg.channel.send("No player found.");
 
-        console.log(player)
-        const track = player.current;
+    //     console.log(player)
+    //     const track = player.current;
 
-        if (!track) return eventArg.channel.send("No song currently playing.");
+    //     if (!track) return eventArg.channel.send("No song currently playing.");
 
-        const embed = {
-        title: "Now Playing",
-        description: `${track.info.title} | ${track.info.author}`
-        };
+    //     const embed = {
+    //     title: "Now Playing",
+    //     description: `${track.info.title} | ${track.info.author}`
+    //     };
 
-        eventArg.channel.send({ embeds: [embed] });
-    }
+    //     eventArg.channel.send({ embeds: [embed] });
+    // }
 
-    if (command === "loop") {
-        const player = client.riffy.players.get(eventArg.guild.id);
-        if (!player) return eventArg.channel.send("No player found.");
+    // if (command === "loop") {
+    //     const player = client.riffy.players.get(eventArg.guild.id);
+    //     if (!player) return eventArg.channel.send("No player found.");
 
-        const loop = args[0];
-        if (!loop || !["queue", "track"].includes(loop))
-        return eventArg.channel.send(
-            "Please provide a valid loop option: `queue` or `track`."
-        );
+    //     const loop = args[0];
+    //     if (!loop || !["queue", "track"].includes(loop))
+    //     return eventArg.channel.send(
+    //         "Please provide a valid loop option: `queue` or `track`."
+    //     );
 
-        const toggleLoop = () => {
-        const loopType = player.loop === loop ? "none" : loop;
-        player.setLoop(loopType);
-        eventArg.channel.send(
-            `${loop.charAt(0).toUpperCase() + loop.slice(1)} loop is now ${loopType === "none" ? "disabled" : "enabled"
-            }.`
-        );
-        };
+    //     const toggleLoop = () => {
+    //     const loopType = player.loop === loop ? "none" : loop;
+    //     player.setLoop(loopType);
+    //     eventArg.channel.send(
+    //         `${loop.charAt(0).toUpperCase() + loop.slice(1)} loop is now ${loopType === "none" ? "disabled" : "enabled"
+    //         }.`
+    //     );
+    //     };
 
-        toggleLoop();
-    }
+    //     toggleLoop();
+    // }
 
-    if (command === "shuffle") {
-        const player = client.riffy.players.get(eventArg.guild.id);
-        if (!player) return eventArg.channel.send("No player found.");
+    // if (command === "shuffle") {
+    //     const player = client.riffy.players.get(eventArg.guild.id);
+    //     if (!player) return eventArg.channel.send("No player found.");
 
-        player.queue.shuffle();
-        eventArg.channel.send("Shuffled the queue.");
-    }
+    //     player.queue.shuffle();
+    //     eventArg.channel.send("Shuffled the queue.");
+    // }
 
-    if (command === "remove") {
-        const player = client.riffy.players.get(eventArg.guild.id);
-        if (!player) return eventArg.channel.send("No player found.");
+    // if (command === "remove") {
+    //     const player = client.riffy.players.get(eventArg.guild.id);
+    //     if (!player) return eventArg.channel.send("No player found.");
 
-        const index = parseInt(args[0]);
-        if (!index || isNaN(index))
-        return eventArg.channel.send("Please provide a valid number.");
+    //     const index = parseInt(args[0]);
+    //     if (!index || isNaN(index))
+    //     return eventArg.channel.send("Please provide a valid number.");
 
-        const removed = player.queue.remove(index);
-        eventArg.channel.send(`Removed: \`${removed.info.title}\` from the queue.`);
-    }
+    //     const removed = player.queue.remove(index);
+    //     eventArg.channel.send(`Removed: \`${removed.info.title}\` from the queue.`);
+    // }
 
-    if (command === "clear") {
-        const player = client.riffy.players.get(eventArg.guild.id);
-        if (!player) return eventArg.channel.send("No player found.");
+    // if (command === "clear") {
+    //     const player = client.riffy.players.get(eventArg.guild.id);
+    //     if (!player) return eventArg.channel.send("No player found.");
 
-        player.queue.clear();
-        eventArg.channel.send("Cleared the queue.");
-    }
+    //     player.queue.clear();
+    //     eventArg.channel.send("Cleared the queue.");
+    // }
 
-    if (command === "filter") {
-        const player = client.riffy.players.get(eventArg.guild.id);
-        if (!player) return eventArg.channel.send("No player found.");
+    // if (command === "filter") {
+    //     const player = client.riffy.players.get(eventArg.guild.id);
+    //     if (!player) return eventArg.channel.send("No player found.");
 
-        const filter = args[0];
+    //     const filter = args[0];
 
-        const filterActions = {
-        "8d": { method: "set8D", eventArg: "8D filter enabled." },
-        bassboost: {
-            method: "setBassboost",
-            eventArg: "Bassboost filter enabled.",
-        },
-        channelmix: {
-            method: "setChannelMix",
-            eventArg: "Channelmix filter enabled.",
-        },
-        distortion: {
-            method: "setDistortion",
-            eventArg: "Distortion filter enabled.",
-        },
-        karaoke: { method: "setKaraoke", eventArg: "Karaoke filter enabled." },
-        lowpass: { method: "setLowPass", eventArg: "Lowpass filter enabled." },
-        nightcore: {
-            method: "setNightcore",
-            eventArg: "Nightcore filter enabled.",
-        },
-        rotate: { method: "setRotation", eventArg: "Rotate filter enabled." },
-        slowmode: { method: "setSlowmode", eventArg: "Slowmode filter enabled." },
-        timescale: {
-            method: "setTimescale",
-            eventArg: "Timescale filter enabled.",
-        },
-        tremolo: { method: "setTremolo", eventArg: "Tremolo filter enabled." },
-        vaporwave: {
-            method: "setVaporwave",
-            eventArg: "Vaporwave filter enabled.",
-        },
-        vibrato: { method: "setVibrato", eventArg: "Vibrato filter enabled." },
-        };
+    //     const filterActions = {
+    //     "8d": { method: "set8D", eventArg: "8D filter enabled." },
+    //     bassboost: {
+    //         method: "setBassboost",
+    //         eventArg: "Bassboost filter enabled.",
+    //     },
+    //     channelmix: {
+    //         method: "setChannelMix",
+    //         eventArg: "Channelmix filter enabled.",
+    //     },
+    //     distortion: {
+    //         method: "setDistortion",
+    //         eventArg: "Distortion filter enabled.",
+    //     },
+    //     karaoke: { method: "setKaraoke", eventArg: "Karaoke filter enabled." },
+    //     lowpass: { method: "setLowPass", eventArg: "Lowpass filter enabled." },
+    //     nightcore: {
+    //         method: "setNightcore",
+    //         eventArg: "Nightcore filter enabled.",
+    //     },
+    //     rotate: { method: "setRotation", eventArg: "Rotate filter enabled." },
+    //     slowmode: { method: "setSlowmode", eventArg: "Slowmode filter enabled." },
+    //     timescale: {
+    //         method: "setTimescale",
+    //         eventArg: "Timescale filter enabled.",
+    //     },
+    //     tremolo: { method: "setTremolo", eventArg: "Tremolo filter enabled." },
+    //     vaporwave: {
+    //         method: "setVaporwave",
+    //         eventArg: "Vaporwave filter enabled.",
+    //     },
+    //     vibrato: { method: "setVibrato", eventArg: "Vibrato filter enabled." },
+    //     };
 
-        const action = filterActions[filter];
-        if (action) {
-        player.filters[action.method](true);
-        eventArg.channel.send(action.eventArg);
-        } else {
-        eventArg.channel.send("Please provide a valid filter option.");
-        }
+    //     const action = filterActions[filter];
+    //     if (action) {
+    //     player.filters[action.method](true);
+    //     eventArg.channel.send(action.eventArg);
+    //     } else {
+    //     eventArg.channel.send("Please provide a valid filter option.");
+    //     }
 
-        // console.log(player.filters);
-    }
+    //     // console.log(player.filters);
+    // }
 
-    if (command === "dfilter") {
-        const player = client.riffy.players.get(eventArg.guild.id);
-        if (!player) return eventArg.channel.send("No player found.");
+    // if (command === "dfilter") {
+    //     const player = client.riffy.players.get(eventArg.guild.id);
+    //     if (!player) return eventArg.channel.send("No player found.");
 
-        const filter = args[0];
+    //     const filter = args[0];
 
-        const filterActions = {
-        "8d": { method: "set8D", eventArg: "8D filter disabled." },
-        bassboost: {
-            method: "setBassboost",
-            eventArg: "Bassboost filter disabled.",
-        },
-        channelmix: {
-            method: "setChannelMix",
-            eventArg: "Channelmix filter disabled.",
-        },
-        distortion: {
-            method: "setDistortion",
-            eventArg: "Distortion filter disabled.",
-        },
-        karaoke: { method: "setKaraoke", eventArg: "Karaoke filter disabled." },
-        lowpass: { method: "setLowPass", eventArg: "Lowpass filter disabled." },
-        nightcore: {
-            method: "setNightcore",
-            eventArg: "Nightcore filter disabled.",
-        },
-        rotate: { method: "setRotation", eventArg: "Rotate filter disabled." },
-        slowmode: { method: "setSlowmode", eventArg: "Slowmode filter disabled." },
-        timescale: {
-            method: "setTimescale",
-            eventArg: "Timescale filter disabled.",
-        },
-        tremolo: { method: "setTremolo", eventArg: "Tremolo filter disabled." },
-        vaporwave: {
-            method: "setVaporwave",
-            eventArg: "Vaporwave filter disabled.",
-        },
-        vibrato: { method: "setVibrato", eventArg: "Vibrato filter disabled." },
-        };
+    //     const filterActions = {
+    //     "8d": { method: "set8D", eventArg: "8D filter disabled." },
+    //     bassboost: {
+    //         method: "setBassboost",
+    //         eventArg: "Bassboost filter disabled.",
+    //     },
+    //     channelmix: {
+    //         method: "setChannelMix",
+    //         eventArg: "Channelmix filter disabled.",
+    //     },
+    //     distortion: {
+    //         method: "setDistortion",
+    //         eventArg: "Distortion filter disabled.",
+    //     },
+    //     karaoke: { method: "setKaraoke", eventArg: "Karaoke filter disabled." },
+    //     lowpass: { method: "setLowPass", eventArg: "Lowpass filter disabled." },
+    //     nightcore: {
+    //         method: "setNightcore",
+    //         eventArg: "Nightcore filter disabled.",
+    //     },
+    //     rotate: { method: "setRotation", eventArg: "Rotate filter disabled." },
+    //     slowmode: { method: "setSlowmode", eventArg: "Slowmode filter disabled." },
+    //     timescale: {
+    //         method: "setTimescale",
+    //         eventArg: "Timescale filter disabled.",
+    //     },
+    //     tremolo: { method: "setTremolo", eventArg: "Tremolo filter disabled." },
+    //     vaporwave: {
+    //         method: "setVaporwave",
+    //         eventArg: "Vaporwave filter disabled.",
+    //     },
+    //     vibrato: { method: "setVibrato", eventArg: "Vibrato filter disabled." },
+    //     };
 
-        const action = filterActions[filter];
-        if (action) {
-        player.filters[action.method](false);
-        eventArg.channel.send(action.eventArg);
-        } else {
-        eventArg.channel.send("Please provide a valid filter option.");
-        }
+    //     const action = filterActions[filter];
+    //     if (action) {
+    //     player.filters[action.method](false);
+    //     eventArg.channel.send(action.eventArg);
+    //     } else {
+    //     eventArg.channel.send("Please provide a valid filter option.");
+    //     }
 
-        // console.log(player.filters);
-    }
+    //     // console.log(player.filters);
+    // }
 
     if (command === "eval" && args[0]) {
         try {

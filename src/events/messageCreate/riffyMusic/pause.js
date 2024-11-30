@@ -1,67 +1,47 @@
 import { EmbedBuilder, Colors } from 'discord.js';
 
+/**
+ * Pauses the music player for the current guild.
+ * 
+ * @param {Object} param0 - The parameters object.
+ * @param {Object} param0.client - The Discord client instance.
+ * @param {Object} param0.eventArg - The event argument containing message details.
+ */
 export default async ({ client, eventArg }) => {
-    if (eventArg.content.startsWith('!') && !eventArg.author.bot) {
-        const args = eventArg.content.slice(1).trim().split(" ");
-        const command = args.shift().toLowerCase();
+    // Extract command and arguments from the message
+    const args = eventArg.content.slice(1).trim().split(" ");
+    const command = args.shift().toLowerCase();
 
-        if (command === "pause") {
-            const player = client.riffy.players.get(eventArg.guild.id);
-            if (!player) {
-                eventArg.channel.send({
-                    embeds: [
-                        new EmbedBuilder()
-                            .setColor(Colors.Red)
-                            .setDescription('No active player found in this server.')
-                    ],
-                });
-                return
-            }
+    if (command === "pause") {
+        // Get the music player for the current guild
+        const player = client.riffy.players.get(eventArg.guild.id);
 
-            if (!eventArg.member.voice.channel || eventArg.member.voice.channel.id !== player.voiceChannel) {
-                eventArg.channel.send({
-                    embeds: [
-                        new EmbedBuilder()
-                            .setColor(Colors.Yellow)
-                            .setDescription('You need to be in the same voice channel as the bot to pause the player.')
-                    ],
-                });
-                return 
-            }
-
-            if (!player.queue.current) {
-                eventArg.channel.send({
-                    embeds: [
-                        new EmbedBuilder()
-                            .setColor(Colors.Red)
-                            .setDescription('There is no song currently playing to pause.')
-                    ],
-                });
-                return 
-            }
-
-            if (player.paused) {
-                eventArg.channel.send({
-                    embeds: [
-                        new EmbedBuilder()
-                            .setColor(Colors.Yellow)
-                            .setDescription('The player is already paused.')
-                    ],
-                });
-                return 
-            }
-
-            // Pause the player
-            player.pause(true);
-
-            eventArg.channel.send({
+        if (!player) {
+            return eventArg.channel.send({
                 embeds: [
                     new EmbedBuilder()
-                        .setColor(Colors.Green)
-                        .setTitle('Player Paused')
-                        .setDescription(`Paused **${player.queue.current.info.title}**.`)
+                        .setColor(Colors.Red)
+                        .setTitle("⚠️ No Player Found")
+                        .setDescription("There is no active music player to pause in this server.")
+                        .setTimestamp(),
                 ],
             });
         }
+
+        console.log(player);
+
+        // Pause the player
+        player.pause(true);
+
+        // Send confirmation message
+        eventArg.channel.send({
+            embeds: [
+                new EmbedBuilder()
+                    .setColor(Colors.Blue)
+                    .setTitle("⏸️ Player Paused")
+                    .setDescription("The music player has been paused. Use the `resume` command to continue playback.")
+                    .setTimestamp(),
+            ],
+        });
     }
 };

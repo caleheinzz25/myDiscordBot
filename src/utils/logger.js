@@ -1,4 +1,3 @@
-import config from '../config/config.json' with { type : 'json'};
 // import membersId from '../config/membersId.json' with { type : 'json' };
 // import getApplicationCommands from './getApplicationCommands.js';
 // import areCommandsDifferent from './areCommandDifferent.js';
@@ -189,6 +188,6 @@ class EventHandlers {
 
 
 export { 
-    config, calculateLevelXp,
+     calculateLevelXp,
 };
 

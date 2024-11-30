@@ -1,59 +1,49 @@
-// import { EmbedBuilder, Colors } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 
-// export default async ({ client, eventArg }) => {
-//     if (eventArg.content.startsWith('!') && !eventArg.author.bot) {
-//         const args = eventArg.content.slice(1).trim().split(" ");
-//         const command = args.shift().toLowerCase();
+/**
+ * Handles incoming events and processes commands prefixed with '!'
+ * 
+ * @param {Object} param0 - The parameters object.
+ * @param {Object} param0.client - The Discord client instance.
+ * @param {Object} param0.eventArg - The event argument containing message details.
+ * @returns {void}
+ */
+export default async ({ client, eventArg }) => {
+    // Ignore messages that do not start with '!' or are sent by a bot
+    if (!eventArg.content.startsWith('!') || eventArg.author.bot) return;
 
-//         if (command === "skip") {
-//             const player = client.riffy.players.get(eventArg.guild.id);
-//             if (!player) {
-//                 eventArg.channel.send({
-//                     embeds: [
-//                         new EmbedBuilder()
-//                             .setColor(Colors.Red)
-//                             .setDescription('No player found. Make sure there is an active player.')
-//                     ],
-//                 });
-//                 return;
-//             }
+    /**
+     * Extract command and arguments from the message
+     * - Removes the prefix ('!')
+     * - Splits the remaining content into command and arguments
+     */
+    const args = eventArg.content.slice(1).trim().split(" ");
+    const command = args.shift().toLowerCase();
 
-//             if (!eventArg.member.voice.channel || eventArg.member.voice.channel.id !== player.voiceChannel) {
-//                 eventArg.channel.send({
-//                     embeds: [
-//                         new EmbedBuilder()
-//                             .setColor(Colors.Yellow)
-//                             .setDescription('You need to be in the same voice channel as the bot to skip songs.')
-//                     ],
-//                 });
-//                 return;
-//             }
+    // Handle the 'skip' command
+    if (command === "skip") {
+        const player = client.riffy.players.get(eventArg.guild.id);
 
-//             if (!player.queue.current) {
-//                 eventArg.channel.send({
-//                     embeds: [
-//                         new EmbedBuilder()
-//                             .setColor(Colors.Red)
-//                             .setDescription('No song is currently playing to skip.')
-//                     ],
-//                 });
-//                 return;
-//             }
+        if (!player) {
+            const noPlayerEmbed = new EmbedBuilder()
+                .setColor("#FF0000") // Red for error
+                .setTitle("⚠️ Error")
+                .setDescription("No player found.")
+                .setTimestamp();
 
-//             const currentTrack = player.queue.current;
+            return eventArg.channel.send({ embeds: [noPlayerEmbed] });
+        }
 
-//             // Skip the current track
-//             player.stop();
+        player.stop();
 
-//             eventArg.channel.send({
-//                 embeds: [
-//                     new EmbedBuilder()
-//                         .setColor(Colors.Green)
-//                         .setTitle('Song Skipped')
-//                         .setDescription(`Skipped **${currentTrack.info.title}**.`)
-//                 ],
-//             });
-//             return;
-//         }
-//     }
-// };
+        const skippedEmbed = new EmbedBuilder()
+            .setColor("#00FF00") // Green for success
+            .setTitle("⏭️ Skipped")
+            .setDescription("Skipped the current song.")
+            .setTimestamp();
+
+        eventArg.channel.send({ embeds: [skippedEmbed] });
+    }
+
+    // Add additional commands below as needed
+};

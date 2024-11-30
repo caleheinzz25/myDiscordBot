@@ -16,6 +16,10 @@ const MusicChannel = model('MusicChannel', new Schema({
     channel_id: {
         type: String,
         required: true,
+    },
+    filters: {
+        type: Array,
+        default: [],
     }
 }));
 

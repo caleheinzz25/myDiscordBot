@@ -1,63 +1,64 @@
 import { EmbedBuilder, Colors } from 'discord.js';
 
+/**
+ * Sets and saves the player's volume for the guild.
+ * 
+ * @param {Object} param0 - The parameters object.
+ * @param {Object} param0.client - The Discord client instance.
+ * @param {Object} param0.eventArg - The event argument containing message details.
+ * @param {Object} param0.db - The database object for Mongoose models.
+ */
 export default async ({ client, eventArg, db }) => {
-    if (eventArg.content.startsWith('!') && !eventArg.author.bot) {
-        const args = eventArg.content.slice(1).trim().split(" ");
-        const command = args.shift().toLowerCase();
+    if (!eventArg.content.startsWith('!') || eventArg.author.bot) return;
 
-        if (command === "volume") {
-            const player = client.riffy.players.get(eventArg.guild.id);
-            const volume = parseInt(args[0]);
+    const args = eventArg.content.slice(1).trim().split(" ");
+    const command = args.shift().toLowerCase();
 
-            if (!player) {
-                eventArg.channel.send({
-                    embeds: [
-                        new EmbedBuilder()
-                            .setColor(Colors.Red)
-                            .setDescription('No active player found in this server.')
-                    ],
-                });
-                return;
-            }
+    if (command === "volume") {
+        const player = client.riffy.players.get(eventArg.guild.id);
 
-            // Check if volume is valid (between 0 and 100)
-            if (!volume || isNaN(volume) || volume < 0 || volume > 100) {
-                eventArg.channel.send({
-                    embeds: [
-                        new EmbedBuilder()
-                            .setColor(Colors.Yellow)
-                            .setDescription('Please provide a valid volume between 0 and 100.')
-                    ],
-                });
-                return;
-            }
-
-            player.setVolume(volume);
-
-            // Store the volume in the database for the guild
-            let volumeGuild = await db.mongoose.MusicChannel.findOne({ guild_id: eventArg.guild.id });
-            if (!volumeGuild) {
-                // If no volume setting exists, create a new one
-                volumeGuild = new db.mongoose.MusicChannel({
-                    guild_id: eventArg.guild.id,
-                    volume: volume,
-                });
-            } else {
-                // Update the existing volume setting
-                volumeGuild.volume = volume;
-            }
-            await volumeGuild.save(); // Save the volume to the database
-
-            console.log("Volume updated successfully!");
-
-            // Send confirmation message with the updated volume
-            eventArg.channel.send({
+        // Check if a player exists
+        if (!player) {
+            return eventArg.channel.send({
                 embeds: [
                     new EmbedBuilder()
-                        .setColor(Colors.Green)
-                        .setDescription(`Set the player volume to: \`${volume}\`.`)
+                        .setColor(Colors.Red)
+                        .setDescription('⚠️ No active player found for this guild.')
+                        .setTimestamp()
                 ],
             });
         }
+
+        const volume = parseInt(args[0]);
+        if (isNaN(volume) || volume < 0 || volume > 100) {
+            return eventArg.channel.send({
+                embeds: [
+                    new EmbedBuilder()
+                        .setColor(Colors.Yellow)
+                        .setDescription('🔊 Please provide a valid volume level (0-100).')
+                        .setTimestamp()
+                ],
+            });
+        }
+
+        // Set the player's volume
+        player.setVolume(volume);
+
+        // Update or create the volume setting in the database
+        await db.mongoose.MusicChannel.findOneAndUpdate(
+            { guild_id: eventArg.guild.id },
+            { $set: { volume: volume } },
+            { upsert: true, new: true }
+        );
+
+        // Send confirmation message
+        return eventArg.channel.send({
+            embeds: [
+                new EmbedBuilder()
+                    .setColor(Colors.Green)
+                    .setDescription(`🔊 Volume set to \`${volume}\` and saved successfully.`)
+                    .setTimestamp()
+            ],
+        });
     }
 };

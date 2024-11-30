@@ -1,29 +1,15 @@
-// import { EventHandlers } from './utils/test.js' 
+
 import { EventHandlers } from './utils/index.js';
-import { Riffy, Track } from 'riffy';
-import { Reminder } from './db/mongoose/schemas/Reminder.js'
+import { Riffy } from 'riffy';
 import { Client, IntentsBitField, GatewayIntentBits } from 'discord.js'
 import dotenv from 'dotenv';
 dotenv.config();
 import { riffyInit } from './riffy/riffy.js'
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import config from './config/config.json' with { type : 'json' };
-
+import { lavaLink } from './utils/lavalink.js';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-// const chat = model.startChat({
-//   history: [
-//     {
-//       role: "user",
-//       parts: [{ text: "pretend to be anime girl named kaoru that has a bit shy personality while answering don't describe any reaction" }],
-//     },
-//     {
-//       role: "model",
-//       parts: [{ text: "Great to meet you. What would you like to know?" }],
-//     },
-//   ],
-// });
 
 const client = new Client({
     intents: [
@@ -39,17 +25,9 @@ const client = new Client({
     ]
   });
 
-const lavaLink = [
-    {
-        host: "lava-all.ajieblogs.eu.org",        
-        port: 443,
-        password: "https://dsc.gg/ajidevserver",
-        secure: true  
-    }
-];
+
 
 client.modelGemini = model;
-// client.chatGemini = chat;
 
 client.riffy = new Riffy(client, lavaLink, {
   send: (payload) => {
@@ -70,15 +48,7 @@ new EventHandlers({
           "mongoose"
       ]
   },
-  // devMode: config.testServer
 })
-
-// new EventHandlers({
-//   client: client.riffy,
-//   eventsPath: "src/riffy",
-//   commandsPath: "src/commands",
-
-// })
 
 riffyInit(client)
 

@@ -1,46 +1,45 @@
 import { EmbedBuilder, Colors } from 'discord.js';
 
+/**
+ * Stops the music player and disconnects from the voice channel.
+ * 
+ * @param {Object} param0 - The parameters object.
+ * @param {Object} param0.client - The Discord client instance.
+ * @param {Object} param0.eventArg - The event argument containing message details.
+ */
 export default async ({ client, eventArg }) => {
-    if (eventArg.content.startsWith('!') && !eventArg.author.bot) {
-        const args = eventArg.content.slice(1).trim().split(" ");
-        const command = args.shift().toLowerCase();
+    // Extract command and arguments from the message
+    const args = eventArg.content.slice(1).trim().split(" ");
+    const command = args.shift().toLowerCase();
 
-        if (command === "stop") {
-            const player = client.riffy.players.get(eventArg.guild.id);
-            if (!player) {
-                eventArg.channel.send({
-                    embeds: [
-                        new EmbedBuilder()
-                            .setColor(Colors.Red)
-                            .setDescription('No active player found in this server.')
-                    ],
-                });
-                return;
-            }
-
-            if (!eventArg.member.voice.channel || eventArg.member.voice.channel.id !== player.voiceChannel) {
-                eventArg.channel.send({
-                    embeds: [
-                        new EmbedBuilder()
-                            .setColor(Colors.Yellow)
-                            .setDescription('You need to be in the same voice channel as the bot to stop the player.')
-                    ],
-                });
-                return;
-            }
-
-            // Destroy the player and disconnect the bot
-            player.destroy();
-
-            eventArg.channel.send({
+    if (command === "stop") {
+        // Get the music player for the current guild
+        const player = client.riffy.players.get(eventArg.guild.id);
+        
+        if (!player) {
+            return eventArg.channel.send({
                 embeds: [
                     new EmbedBuilder()
-                        .setColor(Colors.Green)
-                        .setTitle('Player Stopped')
-                        .setDescription('The player has been stopped, and the bot has disconnected from the voice channel.')
+                        .setColor(Colors.Red)
+                        .setTitle("⚠️ No Player Found")
+                        .setDescription("There is no active music player for this server.")
+                        .setTimestamp(),
                 ],
             });
-            return;
         }
+
+        // Destroy the player and disconnect from the voice channel
+        player.destroy();
+
+        // Send confirmation message
+        eventArg.channel.send({
+            embeds: [
+                new EmbedBuilder()
+                    .setColor(Colors.Green)
+                    .setTitle("🛑 Player Stopped")
+                    .setDescription("The music player has been stopped and disconnected from the voice channel.")
+                    .setTimestamp(),
+            ],
+        });
     }
 };

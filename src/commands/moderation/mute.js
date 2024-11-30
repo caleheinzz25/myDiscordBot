@@ -30,39 +30,39 @@ export default {
   permissionsRequired: [PermissionFlagsBits.MuteMembers],
   botPermissions: [PermissionFlagsBits.MuteMembers],
 
-  callback: async (client, interaction) => {
+  callback: async ({client, eventArg}) => {
     try {
-      const targetUserId = interaction.options.get('target-user').value;
-      const duration = interaction.options.get('duration').value;
+      const targetUserId = eventArg.options.get('target-user').value;
+      const duration = eventArg.options.get('duration').value;
       const reason =
-        interaction.options.get('reason')?.value || 'No reason provided';
+        eventArg.options.get('reason')?.value || 'No reason provided';
 
-      await interaction.deferReply();
+      await eventArg.deferReply();
 
-      const targetUser = await interaction.guild.members.fetch(targetUserId);
+      const targetUser = await eventArg.guild.members.fetch(targetUserId);
 
       if (!targetUser) {
-        return interaction.editReply("That user doesn't exist in this server.");
+        return eventArg.editReply("That user doesn't exist in this server.");
       }
 
-      if (targetUser.id === interaction.guild.ownerId) {
-        return interaction.editReply(
+      if (targetUser.id === eventArg.guild.ownerId) {
+        return eventArg.editReply(
           "You can't mute the server owner."
         );
       }
 
       const targetUserRolePosition = targetUser.roles.highest.position;
-      const requestUserRolePosition = interaction.member.roles.highest.position;
-      const botRolePosition = interaction.guild.members.me.roles.highest.position;
+      const requestUserRolePosition = eventArg.member.roles.highest.position;
+      const botRolePosition = eventArg.guild.members.me.roles.highest.position;
 
       if (targetUserRolePosition >= requestUserRolePosition) {
-        return interaction.editReply(
+        return eventArg.editReply(
           "You can't mute that user because they have the same or a higher role than you."
         );
       }
 
       if (targetUserRolePosition >= botRolePosition) {
-        return interaction.editReply(
+        return eventArg.editReply(
           "I can't mute that user because they have the same or a higher role than me."
         );
       }
@@ -70,13 +70,13 @@ export default {
       // Check if the user is in a voice channel
       const voiceState = targetUser.voice;
       if (!voiceState.channel) {
-        return interaction.editReply('The user is not in a voice channel.');
+        return eventArg.editReply('The user is not in a voice channel.');
       }
 
       // Mute the user
       await voiceState.setMute(true, reason);
 
-      interaction.editReply(
+      eventArg.editReply(
         `User ${targetUser.user.tag} has been muted in voice channels for ${duration} minute(s).\nReason: ${reason}`
       );
 
@@ -91,7 +91,7 @@ export default {
       }, duration * 60 * 1000);
     } catch (error) {
       console.error(`Error muting user: ${error}`);
-      return interaction.editReply(
+      return eventArg.editReply(
         'An error occurred while trying to mute the user.'
       );
     }

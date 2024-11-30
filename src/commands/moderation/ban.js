@@ -34,50 +34,50 @@ export default {
      * @returns 
      */
 
-    callback: async (client, interaction) => {
+    callback: async ({client, eventArg}) => {
 
         try {
-            const targetUserId = interaction.options.get('target-user').value;
+            const targetUserId = eventArg.options.get('target-user').value;
             const reason =
-                interaction.options.get('reason')?.value || 'No reason provided';
+                eventArg.options.get('reason')?.value || 'No reason provided';
 
-            await interaction.deferReply();
+            await eventArg.deferReply();
 
-            const targetUser = await interaction.guild.members.fetch(targetUserId);
+            const targetUser = await eventArg.guild.members.fetch(targetUserId);
 
             if (!targetUser) {
-                return interaction.editReply("That user doesn't exist in this server.");
+                return eventArg.editReply("That user doesn't exist in this server.");
             }
 
-            if (targetUser.id === interaction.guild.ownerId) {
-                return interaction.editReply(
+            if (targetUser.id === eventArg.guild.ownerId) {
+                return eventArg.editReply(
                 "You can't ban the server owner."
                 );
             }
 
             const targetUserRolePosition = targetUser.roles.highest.position;
-            const requestUserRolePosition = interaction.member.roles.highest.position;
-            const botRolePosition = interaction.guild.members.me.roles.highest.position;
+            const requestUserRolePosition = eventArg.member.roles.highest.position;
+            const botRolePosition = eventArg.guild.members.me.roles.highest.position;
 
             if (targetUserRolePosition >= requestUserRolePosition) {
-                return interaction.editReply(
+                return eventArg.editReply(
                 "You can't ban that user because they have the same or a higher role than you."
                 );
             }
 
             if (targetUserRolePosition >= botRolePosition) {
-                return interaction.editReply(
+                return eventArg.editReply(
                 "I can't ban that user because they have the same or a higher role than me."
                 );
             }
 
             await targetUser.ban({ reason });
-            return interaction.editReply(
+            return eventArg.editReply(
                 `User ${targetUser.user.tag} has been banned.\nReason: ${reason}`
             );
         } catch (error) {
             console.error(`Error banning user: ${error}`);
-            return interaction.editReply(
+            return eventArg.editReply(
                 'An error occurred while trying to ban the user.'
             );
         }

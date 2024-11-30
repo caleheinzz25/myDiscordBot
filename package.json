@@ -6,7 +6,7 @@
   "scripts": {
     "dev:warning": "nodemon --trace-warnings ./src/bot.js",
     "dev": "nodemon ./src/bot.js",
-    "test": "nodemon ./src/eventHandlers.js"
+    "test": "nodemon test.js"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +23,7 @@
     "@distube/soundcloud": "^2.0.4",
     "@distube/spotify": "^2.0.2",
     "@distube/yt-dlp": "^2.0.1",
+    "@google/generative-ai": "^0.21.0",
     "canvacord": "^6.0.2",
     "discord-eventmanager": "^1.0.3",
     "dotenv": "^16.4.5",

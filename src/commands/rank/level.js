@@ -14,25 +14,25 @@ export default {
      * @param {Client} client
      * @param {Interaction} interaction
      */
-    callback: async (client, interaction, { mongoose }) => {
-        if (!interaction.inGuild()) {
-        interaction.reply('You can only run this command inside a server.');
+    callback: async ({client, eventArg, db: { mongoose }}) => {
+        if (!eventArg.inGuild()) {
+        eventArg.reply('You can only run this command inside a server.');
         return;
         }
 
-        await interaction.deferReply();
+        await eventArg.deferReply();
 
-        const mentionedUserId = interaction.options.get('target-user')?.value;
-        const targetUserId = mentionedUserId || interaction.member.id;
-        const targetUserObj = await interaction.guild.members.fetch(targetUserId);
+        const mentionedUserId = eventArg.options.get('target-user')?.value;
+        const targetUserId = mentionedUserId || eventArg.member.id;
+        const targetUserObj = await eventArg.guild.members.fetch(targetUserId);
 
         const fetchedLevel = await mongoose.levelSchema.findOne({
         user_id: targetUserId,
-        guild_id: interaction.guild.id,
+        guild_id: eventArg.guild.id,
         });
 
         if (!fetchedLevel) {
-        interaction.editReply(
+        eventArg.editReply(
             mentionedUserId
             ? `${targetUserObj.user.tag} doesn't have any levels yet. Try again when they chat a little more.`
             : "You don't have any levels yet. Chat a little more and try again."
@@ -40,7 +40,7 @@ export default {
         return;
         }
 
-        let allLevels = await mongoose.levelSchema.find({ guild_id: interaction.guild.id }).select(
+        let allLevels = await mongoose.levelSchema.find({ guild_id: eventArg.guild.id }).select(
         '-_id user_id level xp'
         );
 
@@ -73,7 +73,7 @@ export default {
             format: 'png'
         });
         const attachment = new AttachmentBuilder(cardBuffer, { name: 'rank.png' });
-        interaction.editReply({ files: [attachment], ephemeral: true });
+        eventArg.editReply({ files: [attachment], ephemeral: true });
     },
     db: [
         "mongoose"

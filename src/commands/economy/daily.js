@@ -18,9 +18,9 @@ export default {
      * @param {Client} client
      * @param {CommandInteraction} interaction
      */
-    callback: async ({client, interaction, db: { mongoose } }) => {
-        if (!interaction.inGuild()) {
-            interaction.reply({
+    callback: async ({client, eventArg, db: { mongoose } }) => {
+        if (!eventArg.inGuild()) {
+            eventArg.reply({
                 content: 'You can only run this command inside a server.',
                 ephemeral: true,
             });
@@ -28,11 +28,11 @@ export default {
         }
 
         try {
-            await interaction.deferReply();
+            await eventArg.deferReply();
 
             const query = {
-                user_id: interaction.member.id,
-                guild_id: interaction.guild.id,
+                user_id: eventArg.member.id,
+                guild_id: eventArg.guild.id,
             };
 
             let user = await mongoose.userSchema.findOne(query);
@@ -42,7 +42,7 @@ export default {
                 const currentDate = new Date().toDateString();
 
                 if (lastDailyDate === currentDate) {
-                interaction.editReply(
+                eventArg.editReply(
                     'You have already collected your dailies today. Come back tomorrow!'
                 );
                 return;
@@ -59,7 +59,7 @@ export default {
             user.balance += dailyAmount;
             await user.save();
 
-            interaction.editReply(
+            eventArg.editReply(
                 `${dailyAmount} was added to your balance. Your new balance is ${user.balance}`
             );
         } catch (error) {

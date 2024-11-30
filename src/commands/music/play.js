@@ -12,33 +12,33 @@ export default {
       ],
   },
   devOnly: true,
-  callback: async ({ client, interaction }) => {
+  callback: async ({ client, eventArg }) => {
       // Defer reply to allow processing time
-      await interaction.deferReply();
+      await eventArg.deferReply();
 
       // Get the query option provided by the user
-      const query = interaction.options.getString('query');
-      const member = interaction.member;
+      const query = eventArg.options.getString('query');
+      const member = eventArg.member;
 
       // Check if the user is in a voice channel
       if (!member.voice.channel) {
-          await interaction.editReply('You must be in a voice channel to use this command.');
+          await eventArg.editReply('You must be in a voice channel to use this command.');
           return;
       }
 
       try {
           // Create a player connection
           const player = client.riffy.createConnection({
-              guildId: interaction.guild.id,
+              guildId: eventArg.guild.id,
               voiceChannel: member.voice.channel.id,
-              textChannel: interaction.channel.id,
+              textChannel: eventArg.channel.id,
               deaf: true,
           });
 
           // Resolve the query using the riffy client
           const resolve = await client.riffy.resolve({
               query: query,
-              requester: interaction.user,
+              requester: eventArg.user,
           });
 
           const { loadType, tracks, playlistInfo } = resolve;
@@ -46,29 +46,29 @@ export default {
           // Process the resolved data based on load type
           if (loadType === "playlist") {
               for (const track of resolve.tracks) {
-                  track.info.requester = interaction.user;
+                  track.info.requester = eventArg.user;
                   player.queue.add(track);
               }
 
-              await interaction.editReply(
+              await eventArg.editReply(
                   `Added \`${tracks.length}\` tracks from \`${playlistInfo.name}\`.`
               );
 
               if (!player.playing && !player.paused) player.play();
           } else if (loadType === "search" || loadType === "track") {
               const track = tracks.shift();
-              track.info.requester = interaction.user;
+              track.info.requester = eventArg.user;
 
               player.queue.add(track);
-              await interaction.editReply(`Added: \`${track.info.title}\`.`);
+              await eventArg.editReply(`Added: \`${track.info.title}\`.`);
 
               if (!player.playing && !player.paused) player.play();
           } else {
-              await interaction.editReply('No results found for your query.');
+              await eventArg.editReply('No results found for your query.');
           }
       } catch (error) {
           console.error('Error handling play command:', error);
-          await interaction.editReply('An error occurred while processing your request.');
+          await eventArg.editReply('An error occurred while processing your request.');
       }
   },
 };

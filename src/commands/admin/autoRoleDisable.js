@@ -7,17 +7,17 @@ export default {
    * @param {Client} client
    * @param {CommandInteraction} interaction
    */
-  callback: async (client, interaction, { mongoose }) => {
+  callback: async ({client, eventArg, db: { mongoose }}) => {
     try {
-      await interaction.deferReply();
+      await eventArg.deferReply();
 
-      if (!(await mongoose.autoRoleSchema.exists({ guild_id: interaction.guild.id }))) {
-        interaction.editReply('Auto role has not been configured for this server. Use `/autorole-configure` to set it up.');
+      if (!(await mongoose.autoRoleSchema.exists({ guild_id: eventArg.guild.id }))) {
+        eventArg.editReply('Auto role has not been configured for this server. Use `/autorole-configure` to set it up.');
         return;
       }
 
-      await mongoose.autoRoleSchema.findOneAndDelete({ guild_id: interaction.guild.id });
-      interaction.editReply("'Auto role has been disabled for this server. Use `/autorole-configure` to set it up again.'");
+      await mongoose.autoRoleSchema.findOneAndDelete({ guild_id: eventArg.guild.id });
+      eventArg.editReply("'Auto role has been disabled for this server. Use `/autorole-configure` to set it up again.'");
     } catch (error) {
       console.log(error);
     }

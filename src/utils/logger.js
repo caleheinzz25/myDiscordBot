@@ -54,7 +54,7 @@ const organizeFilesByMainFolders = async (basePath) => {
             folderEntry = { folder: mainFolder, files: [] };
             result.push(folderEntry);
         }
-
+        
         const relativeFolderPath = folder.replace(`${path.join(basePath, path.sep)}`, '');
         const matchedFiles = files
             .map(file => file.replace(`${path.join(basePath, path.sep)}`, ''))

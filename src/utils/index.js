@@ -8,13 +8,13 @@ import path from 'path';
  * @property {string[]} [database]
  */
 
-/**
- * @typedef {Object} devObj
- * @property {string} [testServer]
- * @property {string[]} [channels]
- * @property {string[]} [devs]
- * @property {string[]} [badWords]
- */
+// /**
+//  * @typedef {Object} devObj
+//  * @property {string} [testServer]
+//  * @property {string[]} [channels]
+//  * @property {string[]} [devs]
+//  * @property {string[]} [badWords]
+//  */
 
 /**
  * @typedef {Object} EventHandlerOptions
@@ -22,7 +22,7 @@ import path from 'path';
  * @property {string} [commandsPath]
  * @property {string} [eventsPath]
  * @property {dbObject} [db]
- * @property {devObj} [devMode]
+ * @property {string} [devServer]
  */
 
 /**
@@ -41,7 +41,7 @@ class EventHandlers {
         this.commandsPath = options.commandsPath || '';
         this.eventsPath = options.eventsPath || '';
         this.dbOptions = options.db || {};
-        this.devMode = options.devMode || false;
+        this.devServer = options.devServer || false;
         this.db = {};
     
         if (!this.commandsPath || !this.eventsPath) {
@@ -97,10 +97,9 @@ class EventHandlers {
         try {
             // Fetch all event files and their handlers
             const events = await this.getObjectModules(this.eventsPath);
-            console.log(events)
             console.log('Starting event handler setup...');
             console.log('Available events:', Object.keys(events));
-    
+            
             // Iterate over each event and its corresponding handler files
             for (const [eventName, eventFiles] of Object.entries(events)) {
                 // Skip events without handlers (unless it's a specific event like 'interactionCreate')
@@ -113,7 +112,6 @@ class EventHandlers {
     
                 console.log(`\nProcessing event: ${eventName}`);
                 console.log(`Number of handlers: ${eventFiles.length}`);
-    
                 // Use `once` for 'ready' event, and `on` for other events
                 const isOnce = eventName === "ready";
                 const eventMethod = isOnce ? client.once : client.on;
@@ -131,6 +129,7 @@ class EventHandlers {
                             // Special handling for the 'ready' event
                             await this.registerCommands(client);
                         }
+
                         // Loop through event handlers and execute them
                         for (const eventFile of eventFiles) {
                             const funcName = Object.keys(eventFile)[0];
@@ -139,21 +138,22 @@ class EventHandlers {
                             if (handler) {
                                 if (eventName === "interactionCreate") {
                                     // Pass commandObject if it is an interaction event
-                                    await handler({ client, interaction:eventArg, command: commandObject.command, db: this.db });
+                                    if (await handler({ client, eventArg, command: commandObject, db: this.db })) break;
                                     
                                     // After handler, run the callback
                                     if (commandObject.callback) {
-                                        await commandObject.callback({client, interaction:eventArg, command: commandObject.command, db:this.db});
+                                        await commandObject.callback({client, eventArg, command: commandObject, db:this.db});
                                     }
                                     continue;
                                 }
     
                                 if (this.db) {
-                                    await handler({ client, eventArg, db: this.db });
+
+                                    if (await handler({ client, eventArg, db: this.db })) break;
                                     continue;
                                 }
     
-                                await handler(client, eventArg);
+                                if (await handler({ client, eventArg})) break;
                             }
                         }
     
@@ -189,13 +189,15 @@ class EventHandlers {
     
             // Find the command object matching the interaction
             const commandObject = commandsList.find(cmd => cmd.command.name === interaction.commandName);
-    
+            
             // Check if the commandObject exists before proceeding
             if (!commandObject) {
                 console.error(`Command '${interaction.commandName}' not found.`);
                 return;  // Early exit if commandObject is not found
             }
-    
+            
+            // this.checkPermissions(interaction, commandObject)
+
             // Prepare database objects if required
             if (commandObject.db) {
                 // Only collect db objects that are needed by the command
@@ -389,21 +391,21 @@ class EventHandlers {
             // Fetch local commands
             const localCommands = await this.getModules(this.commandsPath);
 
-            if (this.devMode) {
+            if (this.devServer) {
                 console.log("🔧 Dev mode is enabled. Syncing new commands only for the test server.");
             
                 // Fetch the test server's name and ID
-                const testServer = client.guilds.cache.get(this.devMode.testServer);
+                const testServer = client.guilds.cache.get(this.devServer);
             
                 if (!testServer) {
-                    console.error(`❌ Test server with ID "${this.devMode.testServer}" not found in the bot's guild cache.`);
+                    console.error(`❌ Test server with ID "${this.devServer}" not found in the bot's guild cache.`);
                     return;
                 }
             
                 console.log(`📋 Test server: ${testServer.name} (${testServer.id})`);
             
                 // Fetch application commands for the test server
-                const applicationCommands = await this.getApplicationCommands(client, this.devMode.testServer);
+                const applicationCommands = await this.getApplicationCommands(client, this.devServer);
             
                 for (const localCommand of localCommands) {
                     if (!localCommand) continue;
@@ -554,12 +556,12 @@ class EventHandlers {
     //     const { member, guild } = interaction;
 
     //     // Dev-only check
-    //     if (commandObject.devOnly && !this.config.devs.includes(member.id)) {
+    //     if (commandObject.devOnly && !this.devServer.devs.includes(member.id)) {
     //         return { allowed: false, message: 'Only developers are allowed to run this command.' };
     //     }
 
     //     // Test server check
-    //     if (commandObject.testOnly && guild.id !== this.config.testServer) {
+    //     if (commandObject.testOnly && guild.id !== this.devServer.testServer) {
     //         return { allowed: false, message: 'This command cannot be run here.' };
     //     }
 

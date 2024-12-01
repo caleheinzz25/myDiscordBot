@@ -1,5 +1,5 @@
-import { GatewayDispatchEvents, EmbedBuilder } from 'discord.js'
-
+import { GatewayDispatchEvents, EmbedBuilder,Colors } from 'discord.js'
+import { MusicChannel } from "../db/mongoose/schemas/MusicChannel.js"; // Ensure this path is correct
 export const riffyInit = (client) => {
     // This will send log when the lavalink node is connected.
     client.riffy.on("nodeConnect", (node) => {
@@ -24,21 +24,23 @@ export const riffyInit = (client) => {
         if (!channel) return;
         // Ambil informasi pengguna dari cache client
         const requester = client.users.cache.get(track.info.requester.id) || { username: 'Unknown', displayAvatarURL: () => null };
-    
-        // Membuat embed
+        
+
         const embed = new EmbedBuilder()
-            .setColor('#1DB954')
-            .setTitle('🎶 Now Playing')
+            .setColor(Colors.Green)
+            .setTitle("🎶 Now Playing")
             .setDescription(`[${track.info.title}](${track.info.uri})`)
             .addFields(
                 { name: 'Author', value: track.info.author, inline: true },
-                { name: 'Duration', value: formatDuration(track.info.length), inline: true }
+                { name: "Duration", value: formatDuration(track.info.length), inline: true },
             )
-            .setThumbnail(track.info.thumbnail || 'https://example.com/default-thumbnail.png')
+            .setThumbnail(track.info.thumbnail || 'https://i.imgur.com/AfFp7pu.png') // Default thumbnail if none exists
+            .setURL(track.info.uri)
             .setFooter({
                 text: `Requested by ${requester.username}`,
                 iconURL: requester.displayAvatarURL(),
-            });
+            })
+            .setTimestamp();
     
         // Mengirim embed ke channel
         channel.send({ embeds: [embed] });
@@ -57,21 +59,32 @@ export const riffyInit = (client) => {
         return `${minutes}:${seconds}`;
     }
     
-    
+
     // This is the event handler for queue end.
     client.riffy.on("queueEnd", async (player) => {
         const channel = client.channels.cache.get(player.textChannel);
     
-        // Set this to true if you want to enable autoplay.
-        const autoplay = false;
+        // Fetch the MusicChannel record from the database for the current guild
+        const musicChannel = await MusicChannel.findOne({ guild_id: channel.guild.id });
+    
+        // Check if a musicChannel record is found and if autoplay is enabled
+        if (!musicChannel) {
+            return channel.send("❌ No music channel configuration found in the database.");
+        }
+    
+        // Check the auto_play setting from the database
+        const autoplay = musicChannel.auto_play;
     
         if (autoplay) {
+            // If autoplay is enabled in the database, try to enable autoplay for the player
             player.autoplay(player);
         } else {
+            // If autoplay is not enabled, destroy the player and notify the channel
             player.destroy();
             channel.send("Queue has ended.");
         }
     });
+    
     
     // This will update the voice state of the player.
     client.on("raw", (d) => {

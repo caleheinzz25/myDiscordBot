@@ -20,6 +20,10 @@ const MusicChannel = model('MusicChannel', new Schema({
     filters: {
         type: Array,
         default: [],
+    },
+    auto_play:{
+        type: Boolean,
+        default: false,
     }
 }));
 

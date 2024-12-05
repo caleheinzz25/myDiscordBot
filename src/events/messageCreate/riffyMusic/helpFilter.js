@@ -12,7 +12,7 @@ export default async ({ eventArg }) => {
     const args = eventArg.content.slice(1).trim().split(" ");
     const command = args.shift().toLowerCase();
 
-    if (command === "hfilter") {
+    if (command === "helpf") {
         const filters = {
             "8d": "Applies a spatial effect that makes the audio feel like it's moving around you.",
             bassboost: "Increases the bass frequencies for a deeper sound.",

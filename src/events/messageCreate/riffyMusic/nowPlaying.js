@@ -13,7 +13,7 @@ export default async ({ client, eventArg }) => {
     const args = eventArg.content.slice(1).trim().split(" ");
     const command = args.shift().toLowerCase();
 
-    if (command === "nowplaying") {
+    if (command === "now") {
         const player = client.riffy.players.get(eventArg.guild.id);
 
         // Check if the player exists

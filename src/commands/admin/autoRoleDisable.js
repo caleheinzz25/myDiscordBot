@@ -15,7 +15,7 @@ export default {
         eventArg.editReply('Auto role has not been configured for this server. Use `/autorole-configure` to set it up.');
         return;
       }
-
+      
       await mongoose.autoRoleSchema.findOneAndDelete({ guild_id: eventArg.guild.id });
       eventArg.editReply("'Auto role has been disabled for this server. Use `/autorole-configure` to set it up again.'");
     } catch (error) {

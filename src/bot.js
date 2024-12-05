@@ -21,11 +21,8 @@ const client = new Client({
       IntentsBitField.Flags.GuildMessageReactions,
       IntentsBitField.Flags.DirectMessages,
       IntentsBitField.Flags.GuildVoiceStates, 
-      GatewayIntentBits.GuildVoiceStates
     ]
   });
-
-
 
 client.modelGemini = model;
 
@@ -50,7 +47,19 @@ new EventHandlers({
   },
 })
 
+
 riffyInit(client)
 
 
-client.login(process.env.TOKEN);
+client.login(process.env.GPT);
+
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err);
+  process.exit(1);
+});
+
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled Rejection:", reason);
+  process.exit(1);
+});
+

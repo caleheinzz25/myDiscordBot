@@ -125,8 +125,8 @@ class EventHandlers {
                         let commandObject = {};
                         if (eventName === "interactionCreate") {
                             commandObject = await this.handleCommands(client, eventArg, this.db);
-                        } else if (eventName === "ready") {
-                            // Special handling for the 'ready' event
+                        } else if (eventName === "ready" || eventName === "guildCreate" ) {
+                            // Special handling for the 'ready' and 'guildCreate' event
                             await this.registerCommands(client);
                         }
 

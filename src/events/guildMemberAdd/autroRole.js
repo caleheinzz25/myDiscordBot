@@ -5,7 +5,7 @@ import { Client, GuildMember } from 'discord.js';
  * @param {Client} client
  * @param {GuildMember} eventArg
  */
-export default async ({client, eventArg, db}) => {
+export default async ({eventArg, db}) => {
   try {
     const guild = eventArg.guild;
     if (!guild) return;

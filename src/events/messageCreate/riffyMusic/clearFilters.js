@@ -13,7 +13,7 @@ export default async ({ client, eventArg, db }) => {
     const args = eventArg.content.slice(1).trim().split(" ");
     const command = args.shift().toLowerCase();
 
-    if (command === "cfilter") {
+    if (command === "clearf") {
         const player = client.riffy.players.get(eventArg.guild.id);
         if (!player) {
             return eventArg.channel.send({

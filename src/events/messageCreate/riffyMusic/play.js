@@ -14,7 +14,7 @@ export default async ({ client, eventArg, db }) => {
     const args = eventArg.content.slice(1).trim().split(" ");
     const command = args.shift().toLowerCase();
 
-    if (command === "play") {
+    if (command === "p") {
         // Check if the user is in a voice channel
         if (!eventArg.member.voice.channel) {
             return eventArg.channel.send({
@@ -59,7 +59,6 @@ export default async ({ client, eventArg, db }) => {
             textChannel: eventArg.channel.id,
             deaf: true,
         });
-
         // Set the player's volume to the saved value or default to 100
         const volume = musicChannel.volume || 100;
         player.setVolume(volume);
@@ -98,7 +97,6 @@ export default async ({ client, eventArg, db }) => {
 
             }
             
-
             // Prepare the response
             const embed = new EmbedBuilder()
                 .setColor(Colors.Blue)

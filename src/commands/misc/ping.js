@@ -4,7 +4,6 @@ export default {
         name: 'ping',
         description: 'Replies with the bot ping!'
     },
-    devOnly: true,
     callback: async ({client, eventArg}) => {
 
         await eventArg.deferReply();
@@ -15,8 +14,6 @@ export default {
         eventArg.editReply(
         `Pong! Client ${ping}ms | Websocket: ${client.ws.ping}ms`
         );
-
-        console.log(client.riffy)
 
         return
     },

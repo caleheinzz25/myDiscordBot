@@ -1,8 +1,4 @@
 import { Client, CommandInteraction } from 'discord.js';
-
-
-
-
 const dailyAmount = 1000;
 
 export default {

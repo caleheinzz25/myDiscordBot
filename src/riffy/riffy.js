@@ -63,9 +63,8 @@ export const riffyInit = (client) => {
     // This is the event handler for queue end.
     client.riffy.on("queueEnd", async (player) => {
         const channel = client.channels.cache.get(player.textChannel);
-    
         // Fetch the MusicChannel record from the database for the current guild
-        const musicChannel = await MusicChannel.findOne({ guild_id: channel.guild.id });
+        const musicChannel = await MusicChannel.findOne({ guild_id: channel.guildId });
     
         // Check if a musicChannel record is found and if autoplay is enabled
         if (!musicChannel) {
@@ -73,9 +72,7 @@ export const riffyInit = (client) => {
         }
     
         // Check the auto_play setting from the database
-        const autoplay = musicChannel.auto_play;
-    
-        if (autoplay) {
+        if (musicChannel.auto_play) {
             // If autoplay is enabled in the database, try to enable autoplay for the player
             player.autoplay(player);
         } else {

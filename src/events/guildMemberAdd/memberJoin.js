@@ -1,6 +1,6 @@
 const processedeventArgs = new Set(); // Keeps track of processed eventArgs to avoid repeated messages
 
-export default async ({client, eventArg}) => {
+export default async ({eventArg}) => {
   // Check if the guild object exists and has channels
   if (!eventArg.guild || !eventArg.guild.channels) return;
 

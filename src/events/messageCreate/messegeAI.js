@@ -1,53 +1,82 @@
-import { EmbedBuilder } from "discord.js"; // Using embed for a more attractive response
+import { EmbedBuilder } from "discord.js";
 
-export const jancu = async ({ client, eventArg, db}) => {
-    if (eventArg.author.bot) return;
+export const jancu = async ({ client, eventArg, db }) => {
+    if (eventArg.author.bot) return; // Ignore bot messages
 
     try {
-        // Validate if AI is enabled for the channel
-        const channelConfig = await db.mongoose.AIChannels.findOne({ channel_id: eventArg.channel.id });
-
-        if (!channelConfig) {
-            // return eventArg.channel.send("❌ AI is not enabled for this channel.");
-            return
+        // Ensure guild_id is present
+        const guildId = eventArg.guildId;
+        if (!guildId) {
+            return eventArg.channel.send("❌ Guild ID is required for this command.");
         }
 
-        if (!channelConfig.ai_enabled){
-            return eventArg.channel.send("Ai is not active now please activate it using /ai-channel-enable.");
+        console.log(guildId)
+
+        // Fetch channel configuration and conversation history from the database
+        const [channelConfig, AIConversation] = await Promise.all([
+            db.mongoose.AIChannels.findOne({ channel_id: eventArg.channel.id, guild_id: guildId }),
+            db.mongoose.AIConversation.findOne({ channel_id: eventArg.channel.id, guild_id: guildId }),
+        ]);
+
+        if (!channelConfig) return; // If the channel is not configured, silently exit
+
+        if (!channelConfig.ai_enabled) {
+            return eventArg.channel.send("❌ AI is not active. Use `/ai-channel-enable` to activate.");
         }
 
-        // Starting a chat with Gemini or other AI service
+        // Start chat with Gemini AI
         const chat = client.modelGemini.startChat({
             history: [
-              {
-                role: "user",
-                parts: [
-                    {
-                        text: `${channelConfig.ai_description} and named u as ${channelConfig.ai_name}. While answering, don't describe any reaction.`
-                    }
-                ],
-              },
-              {
-                role: "model",
-                parts: [{ text: "Great to meet you. What would you like to know?" }],
-              },
+                {
+                    role: "user",
+                    parts: [
+                        {
+                            text: `${channelConfig.ai_description} and named you ${channelConfig.ai_name}. Avoid describing reactions.`,
+                        },
+                    ],
+                },
+                {
+                    role: "model",
+                    parts: [{ text: "Great to meet you. What would you like to know?" }],
+                },
+                ...(AIConversation?.conversation || []),
             ],
         });
 
-        // Send message to the AI using the ChatGemini API or another service
+        // Send user input to AI and get the response
         const result = await chat.sendMessage(eventArg.content, {
             aiName: channelConfig.ai_name,
             aiDescription: channelConfig.ai_description,
         });
 
         if (!result || !result.response) {
-            return eventArg.channel.send("❌ There was an error receiving the response from the AI.");
+            return eventArg.channel.send("❌ Error receiving response from the AI.");
         }
 
-        // Format the response into an embed
+        const aiResponse = result.response.text();
+
+        // Update the conversation in the database
+        if (AIConversation) {
+            AIConversation.conversation.push(
+                { role: "user", parts: [{ text: eventArg.content }] },
+                { role: "model", parts: [{ text: aiResponse }] }
+            );
+            await AIConversation.save();
+        } else {
+            await db.mongoose.AIConversation.create({
+                channel_id: eventArg.channel.id,
+                guild_id: guildId, // Ensure guild_id is saved
+                conversation: [
+                    { role: "user", parts: [{ text: eventArg.content }] },
+                    { role: "model", parts: [{ text: aiResponse }] },
+                ],
+            });
+        }
+
+        // Create and send an embed message
         const embed = new EmbedBuilder()
             .setTitle(`💡 ${channelConfig.ai_name}`)
-            .setDescription(result.response.text() + `\n\n- ask by ${eventArg.author.username}`)
+            .setDescription(`${aiResponse}\n\n- Asked by **${eventArg.author.username}**`)
             .setColor("#00FF99")
             .setTimestamp();
 

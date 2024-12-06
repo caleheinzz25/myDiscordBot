@@ -10,7 +10,7 @@ export const jancu = async ({ client, eventArg, db }) => {
             return eventArg.channel.send("❌ Guild ID is required for this command.");
         }
 
-        console.log(guildId)
+        console.log(guildId);
 
         // Fetch channel configuration and conversation history from the database
         const [channelConfig, AIConversation] = await Promise.all([
@@ -22,6 +22,12 @@ export const jancu = async ({ client, eventArg, db }) => {
 
         if (!channelConfig.ai_enabled) {
             return eventArg.channel.send("❌ AI is not active. Use `/ai-channel-enable` to activate.");
+        }
+
+        // Ensure conversation array doesn't exceed 35 messages
+        let conversationHistory = AIConversation?.conversation || [];
+        if (conversationHistory.length > 35) {
+            conversationHistory = []; // Reset the conversation history if it exceeds 35 messages
         }
 
         // Start chat with Gemini AI
@@ -39,7 +45,7 @@ export const jancu = async ({ client, eventArg, db }) => {
                     role: "model",
                     parts: [{ text: "Great to meet you. What would you like to know?" }],
                 },
-                ...(AIConversation?.conversation || []),
+                ...conversationHistory, // Use the filtered conversation history
             ],
         });
 

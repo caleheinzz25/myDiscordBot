@@ -51,7 +51,7 @@ new EventHandlers({
 riffyInit(client)
 
 
-client.login(process.env.GPT);
+client.login(process.env.TOKEN);
 
 process.on("uncaughtException", (err) => {
   console.error("Uncaught Exception:", err);

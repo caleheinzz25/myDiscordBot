@@ -10,8 +10,6 @@ export const jancu = async ({ client, eventArg, db }) => {
             return eventArg.channel.send("❌ Guild ID is required for this command.");
         }
 
-        console.log(guildId);
-
         // Fetch channel configuration and conversation history from the database
         const [channelConfig, AIConversation] = await Promise.all([
             db.mongoose.AIChannels.findOne({ channel_id: eventArg.channel.id, guild_id: guildId }),
